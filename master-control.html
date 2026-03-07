@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MASTER CONTROL</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void: #01050a;
+    --bg-deep: #020a12;
+    --bg-panel: #050f1a;
+    --bg-card: #070f1c;
+    --border-dim: rgba(20, 60, 120, 0.35);
+    --border-glow: rgba(0, 140, 255, 0.5);
+    --blue-core: #0088ff;
+    --blue-bright: #33aaff;
+    --blue-deep: #004488;
+    --purple-core: #7733ff;
+    --purple-bright: #aa66ff;
+    --green-core: #00ff88;
+    --green-dim: #00bb66;
+    --red-core: #ff2244;
+    --red-dim: #bb1133;
+    --amber-core: #ffaa00;
+    --cyan-core: #00ddff;
+    --text-primary: #d0e8ff;
+    --text-secondary: #6090bb;
+    --text-dim: #2a4a6a;
+    --text-mono: #44ccaa;
+    --noah-color: #0088ff;
+    --clue-color: #00ff88;
+    --neo-color: #7733ff;
+    --moe-color: #ff2244;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 100, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 100, 255, 0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    animation: gridShift 25s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 15% 40%, rgba(0, 60, 180, 0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(100, 30, 220, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 90%, rgba(0, 160, 80, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes gridShift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(44px, 44px); }
+  }
+
+  /* SCANLINES */
+  .scanline {
+    position: fixed;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 136, 255, 0.15) 30%, rgba(0, 200, 255, 0.4) 50%, rgba(0, 136, 255, 0.15) 70%, transparent 100%);
+    animation: scanDown 10s linear infinite;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @keyframes scanDown {
+    0% { top: -2px; opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { top: 100vh; opacity: 0; }
+  }
+
+  /* CORNER ACCENTS */
+  .corner { position: fixed; width: 30px; height: 30px; pointer-events: none; z-index: 200; opacity: 0.5; }
+  .corner-tl { top: 12px; left: 12px; border-top: 1px solid var(--blue-core); border-left: 1px solid var(--blue-core); }
+  .corner-tr { top: 12px; right: 12px; border-top: 1px solid var(--blue-core); border-right: 1px solid var(--blue-core); }
+  .corner-bl { bottom: 12px; left: 12px; border-bottom: 1px solid var(--blue-core); border-left: 1px solid var(--blue-core); }
+  .corner-br { bottom: 12px; right: 12px; border-bottom: 1px solid var(--blue-core); border-right: 1px solid var(--blue-core); }
+
+  /* HEADER */
+  .header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 36px;
+    border-bottom: 1px solid var(--border-dim);
+    background: rgba(2, 8, 18, 0.95);
+    backdrop-filter: blur(24px);
+  }
+
+  .header-left { display: flex; align-items: center; gap: 28px; }
+
+  .logo-wrap { position: relative; }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: #ffffff;
+    text-shadow:
+      0 0 20px rgba(255,255,255,0.3),
+      0 0 40px rgba(0, 136, 255, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo span {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.4);
+  }
+
+  .logo-underline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), rgba(0,136,255,0.8), rgba(255,255,255,0.5), transparent);
+    margin-top: 4px;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .logo-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    margin-top: 3px;
+    text-align: center;
+  }
+
+  .sys-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--green-core);
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 4px;
+    background: rgba(0, 255, 136, 0.04);
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green-core);
+    box-shadow: 0 0 8px var(--green-core);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .header-right { display: flex; align-items: center; gap: 28px; }
+
+  .hstat {
+    text-align: center;
+    padding: 0 16px;
+    border-left: 1px solid var(--border-dim);
+  }
+
+  .hstat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  }
+
+  .hstat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .clock {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 3px;
+    padding-left: 16px;
+    border-left: 1px solid var(--border-dim);
+  }
+
+  /* MAIN */
+  .main {
+    position: relative;
+    z-index: 5;
+    padding: 22px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 1700px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 5px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-dim), transparent);
+  }
+
+  /* AGENTS */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .agent-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--ac);
+    box-shadow: 0 0 16px var(--ac);
+  }
+
+  .agent-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -10%, var(--ac-dim) 0%, transparent 65%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .agent-card:hover { border-color: var(--ac); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px var(--ac-dim); }
+  .agent-card:hover::after { opacity: 1; }
+  .agent-card.active-card { border-color: var(--ac); box-shadow: 0 0 25px var(--ac-dim); }
+
+  .agent-card.noah { --ac: #0088ff; --ac-dim: rgba(0,136,255,0.1); }
+  .agent-card.clue { --ac: #00ff88; --ac-dim: rgba(0,255,136,0.07); }
+  .agent-card.neo  { --ac: #7733ff; --ac-dim: rgba(119,51,255,0.1); }
+  .agent-card.moe  { --ac: #ff2244; --ac-dim: rgba(255,34,68,0.09); }
+
+  .agent-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 6px;
+    border: 2px solid var(--ac);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 17px; font-weight: 900;
+    color: var(--ac);
+    background: rgba(0,0,0,0.4);
+    box-shadow: 0 0 12px var(--ac-dim), inset 0 0 8px rgba(0,0,0,0.6);
+    position: relative; z-index: 1;
+  }
+
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 20px; border: 1px solid;
+    position: relative; z-index: 1;
+  }
+
+  .badge-on { color: var(--green-core); border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.07); box-shadow: 0 0 6px rgba(0,255,136,0.15); }
+  .badge-off { color: var(--text-dim); border-color: var(--border-dim); background: rgba(10,20,35,0.5); }
+
+  .agent-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 19px; font-weight: 700;
+    color: var(--ac); letter-spacing: 2px;
+    position: relative; z-index: 1; margin-bottom: 3px;
+  }
+
+  .agent-role {
+    font-size: 11px; color: var(--text-secondary);
+    letter-spacing: 0.5px; position: relative; z-index: 1; margin-bottom: 14px;
+  }
+
+  .task-box {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--border-dim);
+    border-radius: 5px; padding: 9px 11px;
+    position: relative; z-index: 1; margin-bottom: 12px;
+  }
+
+  .task-lbl { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 4px; }
+  .task-txt { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .task-txt.dim { color: var(--text-dim); font-style: italic; }
+
+  .agent-metrics { display: flex; gap: 10px; position: relative; z-index: 1; margin-bottom: 12px; }
+
+  .metric { flex: 1; text-align: center; padding: 8px 4px; background: rgba(0,0,0,0.25); border-radius: 4px; border: 1px solid var(--border-dim); }
+  .metric-val { font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700; color: var(--ac); }
+  .metric-val.dim { color: var(--text-dim); }
+  .metric-lbl { font-family: 'Share Tech Mono', monospace; font-size: 7px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+
+  .ctx-bar { position: relative; z-index: 1; }
+  .ctx-bar-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .ctx-bar-lbl { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; }
+  .ctx-bar-val { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--ac); }
+  .ctx-track { height: 3px; background: rgba(255,255,255,0.04); border-radius: 2px; }
+  .ctx-fill { height: 100%; border-radius: 2px; background: var(--ac); box-shadow: 0 0 6px var(--ac); }
+
+  .view-btn {
+    position: relative; z-index: 1;
+    margin-top: 12px; width: 100%;
+    padding: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--ac);
+    border-radius: 4px;
+    color: var(--ac);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .view-btn:hover { background: var(--ac-dim); box-shadow: 0 0 10px var(--ac-dim); }
+  .view-btn.disabled { border-color: var(--border-dim); color: var(--text-dim); cursor: not-allowed; }
+  .view-btn.disabled:hover { background: transparent; box-shadow: none; }
+
+  .card-glow { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--ac), transparent); opacity: 0.2; }
+
+  /* AGENT MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 5, 15, 0.85);
+    z-index: 1000;
+    display: none;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    width: 680px; max-height: 80vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 0 60px rgba(0,136,255,0.15);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border-dim);
+    background: rgba(0,0,0,0.4);
+  }
+
+  .modal-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px; font-weight: 700;
+    letter-spacing: 3px;
+  }
+
+  .modal-close {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border-dim);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { border-color: var(--red-core); color: var(--red-core); }
+
+  .modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; }
+
+  .modal-section-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; color: var(--text-dim);
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-dim);
+  }
+
+  .live-feed { display: flex; flex-direction: column; gap: 0; }
+
+  .feed-item {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid rgba(20,50,100,0.2);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feed-time { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); white-space: nowrap; min-width: 50px; margin-top: 1px; }
+  .feed-role { font-family: 'Share Tech Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 3px; white-space: nowrap; height: fit-content; }
+  .feed-msg { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .feed-msg strong { color: var(--text-primary); }
+
+  .modal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+
+  .mstat { padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 6px; text-align: center; }
+  .mstat-val { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; }
+  .mstat-lbl { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; }
+
+  /* MIDDLE ROW */
+  .mid-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px; padding: 18px;
+    position: relative; overflow: hidden;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 3px;
+    color: var(--text-secondary); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .ptdot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* TOKEN */
+  .tok-total { text-align: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border-dim); }
+  .tok-val { font-family: 'Orbitron', monospace; font-size: 34px; font-weight: 900; color: #ffffff; text-shadow: 0 0 20px rgba(0,136,255,0.3); }
+  .tok-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 3px; margin-top: 4px; }
+
+  .tok-rows { display: flex; flex-direction: column; gap: 9px; }
+  .tok-row { display: flex; align-items: center; gap: 10px; }
+  .tok-name { font-family: 'Orbitron', monospace; font-size: 10px; font-weight: 700; width: 48px; }
+  .tok-track { flex: 1; height: 5px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+  .tok-fill { height: 100%; border-radius: 3px; }
+  .tok-count { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-secondary); width: 44px; text-align: right; }
+
+  /* COST */
+  .cost-center { text-align: center; margin-bottom: 14px; }
+  .cost-big { font-family: 'Orbitron', monospace; font-size: 30px; font-weight: 900; color: var(--amber-core); text-shadow: 0 0 16px rgba(255,170,0,0.25); }
+  .cost-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); letter-spacing: 3px; }
+  .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .cbox { padding: 11px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 5px; text-align: center; }
+  .cbox-val { font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 700; color: var(--cyan-core); }
+  .cbox-lbl { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); letter-spacing: 1px; margin-top: 3px; }
+
+  /* SECURITY */
+  .sec-list { display: flex; flex-direction: column; gap: 8px; }
+  .sec-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim); border-radius: 5px; }
+  .sec-ico { font-size: 14px; width: 20px; text-align: center; }
+  .sec-info { flex: 1; }
+  .sec-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .sec-detail { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); margin-top: 1px; }
+  .sec-tag { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; }
+  .tag-ok { color: var(--green-core); background: rgba(0,255,136,0.07); border: 1px solid rgba(0,255,136,0.25); }
+  .tag-warn { color: var(--amber-core); background: rgba(255,170,0,0.07); border: 1px solid rgba(255,170,0,0.25); }
+  .tag-off { color: var(--text-dim); background: rgba(20,40,70,0.3); border: 1px solid var(--border-dim); }
+
+  /* BOTTOM */
+  .bot-row { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; }
+
+  /* KANBAN */
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .kcol { background: rgba(0,0,0,0.2); border: 1px solid var(--border-dim); border-radius: 6px; padding: 12px; min-height: 180px; }
+  .khead { font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 3px; margin-bottom: 12px; padding-bottom: 9px; border-bottom: 1px solid; display: flex; align-items: center; justify-content: space-between; }
+  .khead.bl { color: var(--text-dim); border-color: rgba(40,70,120,0.3); }
+  .khead.pr { color: var(--amber-core); border-color: rgba(255,170,0,0.25); }
+  .khead.dn { color: var(--green-core); border-color: rgba(0,255,136,0.25); }
+  .kbadge { width: 18px; height: 18px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700; }
+  .kb-bl { background: rgba(40,70,120,0.2); color: var(--text-dim); }
+  .kb-pr { background: rgba(255,170,0,0.12); color: var(--amber-core); }
+  .kb-dn { background: rgba(0,255,136,0.08); color: var(--green-core); }
+
+  .tcard { background: var(--bg-panel); border: 1px solid var(--border-dim); border-radius: 5px; padding: 9px 11px; margin-bottom: 7px; transition: all 0.2s; cursor: pointer; }
+  .tcard:hover { border-color: var(--blue-core); transform: translateX(2px); }
+  .tcard-name { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+  .tcard-meta { display: flex; align-items: center; justify-content: space-between; }
+  .ttag { font-family: 'Share Tech Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 3px; }
+  .nt { color: var(--blue-core); background: rgba(0,136,255,0.09); }
+  .ct { color: var(--green-core); background: rgba(0,255,136,0.07); }
+  .et { color: var(--purple-bright); background: rgba(119,51,255,0.09); }
+  .mt { color: var(--red-core); background: rgba(255,34,68,0.09); }
+  .ttime { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); }
+
+  /* ACTIVITY */
+  .act-feed { display: flex; flex-direction: column; max-height: 260px; overflow-y: auto; }
+  .act-feed::-webkit-scrollbar { width: 2px; }
+  .act-feed::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 2px; }
+  .act-item { display: flex; align-items: flex-start; gap: 9px; padding: 9px 0; border-bottom: 1px solid rgba(20,50,100,0.12); animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; } }
+  .act-time { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--text-dim); white-space: nowrap; margin-top: 2px; min-width: 40px; }
+  .act-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; box-shadow: 0 0 5px currentColor; }
+  .act-txt { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .act-txt strong { color: var(--text-primary); font-weight: 700; }
+
+  @media (max-width: 1200px) {
+    .agents-grid { grid-template-columns: repeat(2, 1fr); }
+    .mid-row { grid-template-columns: 1fr 1fr; }
+    .bot-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+<div class="corner corner-tl"></div>
+<div class="corner corner-tr"></div>
+<div class="corner corner-bl"></div>
+<div class="corner corner-br"></div>
+
+<!-- AGENT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle" style="color: #0088ff;">◈ NOAH — LIVE FEED</div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-stats" id="modalStats"></div>
+      <div class="modal-section-title">◈ RECENT ACTIVITY & SESSION LOG</div>
+      <div class="live-feed" id="modalFeed"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-wrap">
+      <div class="logo">MASTER CONTROL</div>
+      <div class="logo-underline"></div>
+      <div class="logo-sub">EMPIRE COMMAND CENTER · SRV1389274</div>
+    </div>
+    <div class="sys-status">
+      <div class="status-dot"></div>
+      SYSTEM NOMINAL
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="hstat">
+      <div class="hstat-val">1/4</div>
+      <div class="hstat-label">AGENTS LIVE</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">14.2K</div>
+      <div class="hstat-label">TOKENS TODAY</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val">$0.08</div>
+      <div class="hstat-label">TODAY'S COST</div>
+    </div>
+    <div class="clock" id="clock">--:--:-- UTC</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- AGENTS -->
+  <div>
+    <div class="section-label">◈ AGENT ROSTER</div>
+    <div class="agents-grid">
+
+      <div class="agent-card noah" onclick="openModal('noah')">
+        <div class="agent-head">
+          <div class="avatar">N</div>
+          <div class="badge badge-on">● ONLINE</div>
+        </div>
+        <div class="agent-name">NOAH</div>
+        <div class="agent-role">Supreme Head Agent · COO</div>
+        <div class="task-box">
+          <div class="task-lbl">CURRENT TASK</div>
+          <div class="task-txt">Managing empire operations</div>
+        </div>
+        <div class="agent-metrics">
+          <div class="metric"><div class="metric-val">14.2K</div><div class="metric-lbl">TOKENS</div></div>
+          <div class="metric"><div class="metric-val">3</div><div class="metric-lbl">SESSIONS</div></div>
+          <div class="metric"><div class="metric-val">97%</div><div class="metric-lbl">CACHED</div></div>
+        </div>
+        <div class="ctx-bar">
+          <div class="ctx-bar-head"><span class="ctx-bar-lbl">CTX USAGE</span><span class="ctx-bar-val">7%</span></div>
+          <div class="ctx-track"><div class="ctx-fill" style="width:7%; background:#0088ff; box-shadow:0 0 6px #0088ff;"></div></div>
+        </div>
+        <div class="view-btn">▶ VIEW LIVE FEED</div>
+        <div class="card-glow"></div>
+      </div>
+
+      <div class="agent-card clue" onclick="openModal('clue')">
+        <div class="agent-head">
+          <div class="avatar">C</div>
+          <div class="badge badge-off">○ OFFLINE</div>
+        </div>
+        <div class="agent-name">CLUE</div>
+        <div class="agent-role">E-Commerce Head Agent</div>
+        <div class="task-box">
+          <div class="task-lbl">CURRENT TASK</div>
+          <div class="task-txt dim">Not yet deployed</div>
+        </div>
+        <div class="agent-metrics">
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">TOKENS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">SESSIONS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">CACHED</div></div>
+        </div>
+        <div class="ctx-bar">
+          <div class="ctx-bar-head"><span class="ctx-bar-lbl">CTX USAGE</span><span class="ctx-bar-val" style="color:var(--text-dim)">0%</span></div>
+          <div class="ctx-track"><div class="ctx-fill" style="width:0%;background:#00ff88;"></div></div>
+        </div>
+        <div class="view-btn disabled">○ AGENT OFFLINE</div>
+        <div class="card-glow"></div>
+      </div>
+
+      <div class="agent-card neo" onclick="openModal('neo')">
+        <div class="agent-head">
+          <div class="avatar">N</div>
+          <div class="badge badge-off">○ OFFLINE</div>
+        </div>
+        <div class="agent-name">NEO</div>
+        <div class="agent-role">Intelligence & Insights Agent</div>
+        <div class="task-box">
+          <div class="task-lbl">CURRENT TASK</div>
+          <div class="task-txt dim">Not yet deployed</div>
+        </div>
+        <div class="agent-metrics">
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">TOKENS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">SESSIONS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">CACHED</div></div>
+        </div>
+        <div class="ctx-bar">
+          <div class="ctx-bar-head"><span class="ctx-bar-lbl">CTX USAGE</span><span class="ctx-bar-val" style="color:var(--text-dim)">0%</span></div>
+          <div class="ctx-track"><div class="ctx-fill" style="width:0%;background:#7733ff;"></div></div>
+        </div>
+        <div class="view-btn disabled">○ AGENT OFFLINE</div>
+        <div class="card-glow"></div>
+      </div>
+
+      <div class="agent-card moe" onclick="openModal('moe')">
+        <div class="agent-head">
+          <div class="avatar">M</div>
+          <div class="badge badge-off">○ OFFLINE</div>
+        </div>
+        <div class="agent-name">MOE</div>
+        <div class="agent-role">B2B & Services Head Agent</div>
+        <div class="task-box">
+          <div class="task-lbl">CURRENT TASK</div>
+          <div class="task-txt dim">Not yet deployed</div>
+        </div>
+        <div class="agent-metrics">
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">TOKENS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">SESSIONS</div></div>
+          <div class="metric"><div class="metric-val dim">—</div><div class="metric-lbl">CACHED</div></div>
+        </div>
+        <div class="ctx-bar">
+          <div class="ctx-bar-head"><span class="ctx-bar-lbl">CTX USAGE</span><span class="ctx-bar-val" style="color:var(--text-dim)">0%</span></div>
+          <div class="ctx-track"><div class="ctx-fill" style="width:0%;background:#ff2244;"></div></div>
+        </div>
+        <div class="view-btn disabled">○ AGENT OFFLINE</div>
+        <div class="card-glow"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div class="mid-row">
+
+    <div class="panel">
+      <div class="panel-title"><div class="ptdot" style="background:#0088ff;box-shadow:0 0 8px #0088ff;"></div>TOKEN USAGE</div>
+      <div class="tok-total">
+        <div class="tok-val">14,200</div>
+        <div class="tok-lbl">TOTAL TOKENS TODAY</div>
+      </div>
+      <div class="tok-rows">
+        <div class="tok-row">
+          <div class="tok-name" style="color:#0088ff">NOAH</div>
+          <div class="tok-track"><div class="tok-fill" style="width:100%;background:#0088ff;box-shadow:0 0 6px #0088ff;"></div></div>
+          <div class="tok-count">14.2K</div>
+        </div>
+        <div class="tok-row">
+          <div class="tok-name" style="color:var(--text-dim)">CLUE</div>
+          <div class="tok-track"><div class="tok-fill" style="width:0%;background:#00ff88;"></div></div>
+          <div class="tok-count" style="color:var(--text-dim)">—</div>
+        </div>
+        <div class="tok-row">
+          <div class="tok-name" style="color:var(--text-dim)">NEO</div>
+          <div class="tok-track"><div class="tok-fill" style="width:0%;background:#7733ff;"></div></div>
+          <div class="tok-count" style="color:var(--text-dim)">—</div>
+        </div>
+        <div class="tok-row">
+          <div class="tok-name" style="color:var(--text-dim)">MOE</div>
+          <div class="tok-track"><div class="tok-fill" style="width:0%;background:#ff2244;"></div></div>
+          <div class="tok-count" style="color:var(--text-dim)">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><div class="ptdot" style="background:var(--amber-core);box-shadow:0 0 8px var(--amber-core);"></div>COST TRACKER</div>
+      <div class="cost-center">
+        <div class="cost-big">$0.08</div>
+        <div class="cost-lbl">TODAY'S SPEND</div>
+      </div>
+      <div class="cost-grid">
+        <div class="cbox"><div class="cbox-val">$0.51</div><div class="cbox-lbl">THIS WEEK</div></div>
+        <div class="cbox"><div class="cbox-val">$1.24</div><div class="cbox-lbl">THIS MONTH</div></div>
+        <div class="cbox"><div class="cbox-val">$50</div><div class="cbox-lbl">DAILY BUDGET</div></div>
+        <div class="cbox"><div class="cbox-val" style="color:var(--green-core)">LOW</div><div class="cbox-lbl">BURN RATE</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><div class="ptdot" style="background:var(--green-core);box-shadow:0 0 8px var(--green-core);"></div>SECURITY GUARD</div>
+      <div class="sec-list">
+        <div class="sec-item">
+          <div class="sec-ico">🔒</div>
+          <div class="sec-info"><div class="sec-name">Discord Access</div><div class="sec-detail">Owner ID locked</div></div>
+          <div class="sec-tag tag-ok">SECURE</div>
+        </div>
+        <div class="sec-item">
+          <div class="sec-ico">📱</div>
+          <div class="sec-info"><div class="sec-name">Telegram Access</div><div class="sec-detail">Owner ID locked</div></div>
+          <div class="sec-tag tag-ok">SECURE</div>
+        </div>
+        <div class="sec-item">
+          <div class="sec-ico">🌐</div>
+          <div class="sec-info"><div class="sec-name">Gateway</div><div class="sec-detail">Loopback only</div></div>
+          <div class="sec-tag tag-ok">SECURE</div>
+        </div>
+        <div class="sec-item">
+          <div class="sec-ico">🔑</div>
+          <div class="sec-info"><div class="sec-name">SSH</div><div class="sec-detail">Port 22 active</div></div>
+          <div class="sec-tag tag-ok">ACTIVE</div>
+        </div>
+        <div class="sec-item">
+          <div class="sec-ico">🛡️</div>
+          <div class="sec-info"><div class="sec-name">Tailscale VPN</div><div class="sec-detail">Agent running</div></div>
+          <div class="sec-tag tag-warn">NEEDS SETUP</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bot-row">
+
+    <div class="panel">
+      <div class="panel-title"><div class="ptdot" style="background:var(--purple-bright);box-shadow:0 0 8px var(--purple-bright);"></div>OPERATIONS BOARD</div>
+      <div class="kanban">
+        <div class="kcol">
+          <div class="khead bl">BACKLOG <span class="kbadge kb-bl">2</span></div>
+          <div class="tcard"><div class="tcard-name">Deploy Clue Agent</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">QUEUED</span></div></div>
+          <div class="tcard"><div class="tcard-name">Connect Meta Ads API</div><div class="tcard-meta"><span class="ttag ct">CLUE</span><span class="ttime">QUEUED</span></div></div>
+        </div>
+        <div class="kcol">
+          <div class="khead pr">IN PROGRESS <span class="kbadge kb-pr">2</span></div>
+          <div class="tcard"><div class="tcard-name">Master Control Dashboard</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">NOW</span></div></div>
+          <div class="tcard"><div class="tcard-name">Memory System Setup</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">TODAY</span></div></div>
+        </div>
+        <div class="kcol">
+          <div class="khead dn">COMPLETED <span class="kbadge kb-dn">4</span></div>
+          <div class="tcard"><div class="tcard-name">Discord Integration</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">DONE</span></div></div>
+          <div class="tcard"><div class="tcard-name">Telegram Integration</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">DONE</span></div></div>
+          <div class="tcard"><div class="tcard-name">GitHub Connected</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">DONE</span></div></div>
+          <div class="tcard"><div class="tcard-name">Security Lockdown</div><div class="tcard-meta"><span class="ttag nt">NOAH</span><span class="ttime">DONE</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><div class="ptdot" style="background:var(--cyan-core);box-shadow:0 0 8px var(--cyan-core);animation:blink 1s infinite;"></div>LIVE ACTIVITY</div>
+      <div class="act-feed" id="actFeed">
+        <div class="act-item"><div class="act-time">42m</div><div class="act-dot" style="color:#0088ff;background:#0088ff;"></div><div class="act-txt"><strong>NOAH</strong> — System initialized</div></div>
+        <div class="act-item"><div class="act-time">28m</div><div class="act-dot" style="color:#0088ff;background:#0088ff;"></div><div class="act-txt"><strong>NOAH</strong> — Telegram approved</div></div>
+        <div class="act-item"><div class="act-time">15m</div><div class="act-dot" style="color:#00ff88;background:#00ff88;"></div><div class="act-txt"><strong>SYSTEM</strong> — Security lockdown</div></div>
+        <div class="act-item"><div class="act-time">8m</div><div class="act-dot" style="color:#0088ff;background:#0088ff;"></div><div class="act-txt"><strong>NOAH</strong> — Identity files written</div></div>
+        <div class="act-item"><div class="act-time">NOW</div><div class="act-dot" style="color:#ffaa00;background:#ffaa00;"></div><div class="act-txt"><strong>SYSTEM</strong> — Master Control deployed</div></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  // Clock
+  function tick() {
+    const n = new Date();
+    document.getElementById('clock').textContent =
+      [n.getUTCHours(),n.getUTCMinutes(),n.getUTCSeconds()]
+      .map(v=>String(v).padStart(2,'0')).join(':') + ' UTC';
+  }
+  setInterval(tick, 1000); tick();
+
+  // Agent data
+  const agentData = {
+    noah: {
+      color: '#0088ff',
+      name: 'NOAH',
+      role: 'Supreme Head Agent · COO',
+      online: true,
+      stats: [
+        { val: '14,200', lbl: 'TOKENS USED' },
+        { val: '3', lbl: 'ACTIVE SESSIONS' },
+        { val: '97%', lbl: 'CACHE HIT RATE' }
+      ],
+      feed: [
+        { time: 'NOW', role: 'ACTION', roleColor: '#0088ff', msg: 'Awaiting next command from Dillon' },
+        { time: '2m', role: 'MEMORY', roleColor: '#00ddff', msg: 'Heartbeat check — all systems nominal' },
+        { time: '8m', role: 'SYSTEM', roleColor: '#00ff88', msg: 'Identity files written to workspace' },
+        { time: '15m', role: 'ACTION', roleColor: '#0088ff', msg: 'Security lockdown applied successfully' },
+        { time: '28m', role: 'CHANNEL', roleColor: '#aa66ff', msg: 'Telegram pairing approved for user 5984924284' },
+        { time: '35m', role: 'MEMORY', roleColor: '#00ddff', msg: 'SOUL.md, IDENTITY.md, USER.md loaded on startup' },
+        { time: '42m', role: 'SYSTEM', roleColor: '#00ff88', msg: 'OpenClaw gateway connected — session active' },
+      ]
+    },
+    clue: { color: '#00ff88', name: 'CLUE', role: 'E-Commerce Head Agent', online: false, stats: [], feed: [] },
+    neo:  { color: '#7733ff', name: 'NEO',  role: 'Intelligence & Insights Agent', online: false, stats: [], feed: [] },
+    moe:  { color: '#ff2244', name: 'MOE',  role: 'B2B & Services Head Agent', online: false, stats: [], feed: [] }
+  };
+
+  function openModal(id) {
+    const d = agentData[id];
+    document.getElementById('modalOverlay').classList.add('open');
+
+    document.getElementById('modalTitle').textContent = `◈ ${d.name} — LIVE FEED`;
+    document.getElementById('modalTitle').style.color = d.color;
+
+    const statsEl = document.getElementById('modalStats');
+    if (!d.online) {
+      statsEl.innerHTML = `<div style="grid-column:span 3;text-align:center;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:3px;padding:20px;">AGENT NOT YET DEPLOYED</div>`;
+    } else {
+      statsEl.innerHTML = d.stats.map(s => `
+        <div class="mstat">
+          <div class="mstat-val" style="color:${d.color}">${s.val}</div>
+          <div class="mstat-lbl">${s.lbl}</div>
+        </div>
+      `).join('');
+    }
+
+    const feedEl = document.getElementById('modalFeed');
+    if (!d.online || d.feed.length === 0) {
+      feedEl.innerHTML = `<div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);text-align:center;padding:30px;letter-spacing:2px;">NO ACTIVITY DATA</div>`;
+    } else {
+      feedEl.innerHTML = d.feed.map(f => `
+        <div class="feed-item">
+          <div class="feed-time">${f.time}</div>
+          <div class="feed-role" style="color:${f.roleColor};background:${f.roleColor}22;border:1px solid ${f.roleColor}44">${f.role}</div>
+          <div class="feed-msg">${f.msg}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+  }
+
+  function closeModalDirect() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  // Live activity ticker
+  const liveEvents = [
+    { color: '#0088ff', txt: '<strong>NOAH</strong> — Heartbeat ping sent' },
+    { color: '#00ddff', txt: '<strong>SYSTEM</strong> — Gateway latency 18ms' },
+    { color: '#0088ff', txt: '<strong>NOAH</strong> — Memory cache synced' },
+    { color: '#00ff88', txt: '<strong>SYSTEM</strong> — Session active · 97% cached' },
+    { color: '#0088ff', txt: '<strong>NOAH</strong> — Standing by for commands' },
+    { color: '#ffaa00', txt: '<strong>SYSTEM</strong> — API key valid · quota nominal' },
+  ];
+  let evIdx = 0;
+  setInterval(() => {
+    const feed = document.getElementById('actFeed');
+    const ev = liveEvents[evIdx % liveEvents.length];
+    const el = document.createElement('div');
+    el.className = 'act-item';
+    el.innerHTML = `<div class="act-time">NOW</div><div class="act-dot" style="color:${ev.color};background:${ev.color};"></div><div class="act-txt">${ev.txt}</div>`;
+    feed.insertBefore(el, feed.firstChild);
+    if (feed.children.length > 10) feed.removeChild(feed.lastChild);
+    evIdx++;
+  }, 7000);
+</script>
+</body>
+</html>
